@@ -1,11 +1,33 @@
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Navbar } from './Navbar';
+import { Login } from './pages/Login';
+import { Register } from './pages/Register';
+import { Dashboard } from './pages/Dashboard';
+import { ProtectedRoute } from './ProtectedRoute';
+
 function App() {
   return (
-    <div className="flex h-screen items-center justify-center bg-gray-900">
-      <h1 className="text-5xl font-bold text-cyan-400">
-        Sample Webpage 🚀
-      </h1>
-    </div>
-  )
+    <Router>
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="container mx-auto py-8">
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </div>
+      </div>
+    </Router>
+  );
 }
 
-export default App
+export default App;
