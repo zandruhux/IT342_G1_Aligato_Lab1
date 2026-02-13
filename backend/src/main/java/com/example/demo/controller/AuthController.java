@@ -1,14 +1,20 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.LoginRequest;
-import com.example.demo.dto.RegisterRequest;
-import com.example.demo.dto.AuthResponse;
-import com.example.demo.dto.UserDTO;
-import com.example.demo.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.dto.AuthResponse;
+import com.example.demo.dto.LoginRequest;
+import com.example.demo.dto.RegisterRequest;
+import com.example.demo.dto.UserDTO;
+import com.example.demo.service.AuthService;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -16,9 +22,6 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    /**
-     * Register endpoint - accepts registration details and returns user info
-     */
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {
@@ -29,9 +32,6 @@ public class AuthController {
         }
     }
 
-    /**
-     * Login endpoint - accepts credentials and returns token + user info
-     */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
@@ -44,9 +44,6 @@ public class AuthController {
         }
     }
 
-    /**
-     * Profile endpoint - requires token in header, returns user info
-     */
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile(@RequestHeader("Authorization") String authHeader) {
         try {
@@ -58,9 +55,6 @@ public class AuthController {
         }
     }
 
-    /**
-     * Logout endpoint - removes token from database
-     */
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String authHeader) {
         try {
@@ -72,9 +66,6 @@ public class AuthController {
         }
     }
 
-    /**
-     * Helper method to extract token from Authorization header
-     */
     private String extractToken(String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             throw new RuntimeException("Invalid or missing token");
@@ -82,9 +73,6 @@ public class AuthController {
         return authHeader.substring(7);
     }
 
-    /**
-     * Error response class
-     */
     public static class ErrorResponse {
         private String message;
 
@@ -101,9 +89,6 @@ public class AuthController {
         }
     }
 
-    /**
-     * Message response class
-     */
     public static class MessageResponse {
         private String message;
 
