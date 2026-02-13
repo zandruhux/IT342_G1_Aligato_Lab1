@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { authAPI } from './api';
 
@@ -6,6 +7,7 @@ export function Navbar() {
   const location = useLocation();
   const token = localStorage.getItem('token');
   const user = localStorage.getItem('user');
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -15,6 +17,7 @@ export function Navbar() {
     } finally {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      setShowLogoutModal(false);
       navigate('/login');
     }
   };
@@ -33,7 +36,7 @@ export function Navbar() {
                 Welcome, {JSON.parse(user).firstName}!
               </span>
               <button
-                onClick={handleLogout}
+                onClick={() => setShowLogoutModal(true)}
                 className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition duration-200"
               >
                 Logout
@@ -57,6 +60,32 @@ export function Navbar() {
           ) : null}
         </div>
       </div>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Confirm Logout</h2>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to logout? You will need to login again to access your account.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition duration-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition duration-200"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
