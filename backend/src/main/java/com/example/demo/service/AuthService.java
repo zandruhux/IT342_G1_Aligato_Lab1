@@ -1,18 +1,17 @@
 package com.example.demo.service;
 
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.example.demo.dto.LoginRequest;
 import com.example.demo.dto.RegisterRequest;
 import com.example.demo.dto.UserDTO;
 import com.example.demo.model.User;
-import com.example.demo.model.AuthToken;
 import com.example.demo.repository.UserRepository;
-import com.example.demo.repository.TokenRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.UUID;
+import com.example.demo.util.JwtUtil;
 
 @Service
 public class AuthService {
@@ -20,10 +19,10 @@ public class AuthService {
     private UserRepository userRepository;
 
     @Autowired
-    private TokenRepository tokenRepository;
+    private JwtUtil jwtUtil;
 
     @Autowired
-    private org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder passwordEncoder;
+    private BCryptPasswordEncoder passwordEncoder;
 
     /**
      * Register a new user with validation
@@ -48,7 +47,7 @@ public class AuthService {
     }
 
     /**
-     * Authenticate user and generate token
+     * Authenticate user and generate JWT token
      */
     public String authenticateUser(LoginRequest request) {
         Optional<User> userOpt = userRepository.findByEmail(request.getEmail());
@@ -69,44 +68,37 @@ public class AuthService {
             throw new RuntimeException("User account is inactive");
         }
 
-        // Generate token
-        String tokenValue = UUID.randomUUID().toString();
-        AuthToken authToken = new AuthToken();
-        authToken.setUser(user);
-        authToken.setToken(tokenValue);
-        authToken.setExpiration(LocalDateTime.now().plusHours(24));
-
-        tokenRepository.save(authToken);
-        return tokenValue;
+        // Generate JWT token
+        return jwtUtil.generateToken(user.getEmail());
     }
 
     /**
-     * Get user by token
+     * Get user by JWT token
      */
     public UserDTO getUserByToken(String token) {
-        Optional<AuthToken> authTokenOpt = tokenRepository.findByToken(token);
-
-        if (authTokenOpt.isEmpty()) {
+        try {
+            // Extract email from JWT
+            String email = jwtUtil.extractUsername(token);
+            
+            // Find user by email
+            Optional<User> userOpt = userRepository.findByEmail(email);
+            
+            if (userOpt.isEmpty()) {
+                throw new RuntimeException("User not found");
+            }
+            
+            return convertToDTO(userOpt.get());
+        } catch (Exception e) {
             throw new RuntimeException("Invalid or expired token");
         }
-
-        AuthToken authToken = authTokenOpt.get();
-
-        // Check if token is expired
-        if (authToken.isExpired()) {
-            tokenRepository.delete(authToken);
-            throw new RuntimeException("Token has expired");
-        }
-
-        return convertToDTO(authToken.getUser());
     }
 
     /**
-     * Logout user by removing token
+     * Logout user (JWT tokens are stateless, so client-side removal is sufficient)
      */
     public void logoutUser(String token) {
-        Optional<AuthToken> authTokenOpt = tokenRepository.findByToken(token);
-        authTokenOpt.ifPresent(tokenRepository::delete);
+        // With JWT, logout is handled client-side by removing the token
+        // No server-side action needed unless implementing token blacklist
     }
 
     /**
