@@ -97,6 +97,7 @@ Last Updated: February 14, 2026
 - [x] Add input validation in LoginActivity - `abd331c`
 - [x] Add error handling and try-catch blocks - `abd331c`
 - [x] Initialize TokenManager in LoginActivity & ProfileActivity - `abd331c`
+- [x] Add logout confirmation dialog to ProfileActivity - `efcc9f2`
 
 ---
 
@@ -114,7 +115,6 @@ _No tasks currently in progress_
 - [ ] Implement password reset functionality
 - [ ] Add email verification workflow
 - [ ] Add refresh token mechanism
-- [ ] Implement rate limiting on authentication endpoints
 
 ---
 
