@@ -1,4 +1,6 @@
 package com.example.userregistrationandauthentication.data
 
-class ApiResponse {
-}
+data class ApiResponse(
+    val success: Boolean,
+    val message: String
+)

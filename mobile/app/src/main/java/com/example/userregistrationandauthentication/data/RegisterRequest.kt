@@ -1,4 +1,8 @@
 package com.example.userregistrationandauthentication.data
 
-class RegisterRequest {
-}
+data class RegisterRequest(
+    val firstName: String,
+    val lastName: String,
+    val email: String,
+    val password: String
+)
