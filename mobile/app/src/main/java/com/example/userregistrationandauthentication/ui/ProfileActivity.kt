@@ -1,5 +1,6 @@
 package com.example.userregistrationandauthentication.ui
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -60,9 +61,28 @@ class ProfileActivity : AppCompatActivity() {
         }
 
         btnLogout.setOnClickListener {
-            TokenManager.clear()
-            redirectToLogin()
+            showLogoutConfirmationDialog()
         }
+    }
+
+    private fun showLogoutConfirmationDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Confirm Logout")
+            .setMessage("Are you sure you want to logout? You will need to login again to access your account.")
+            .setPositiveButton("Logout") { dialog, _ ->
+                dialog.dismiss()
+                performLogout()
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setCancelable(true)
+            .show()
+    }
+
+    private fun performLogout() {
+        TokenManager.clear()
+        redirectToLogin()
     }
 
     private fun redirectToLogin() {
